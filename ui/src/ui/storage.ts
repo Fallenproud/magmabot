@@ -1,4 +1,4 @@
-const KEY = "openclaw.control.settings.v1";
+const KEY = "openclaw.control.settings.v2";
 
 import type { ThemeMode } from "./theme.ts";
 
@@ -23,7 +23,7 @@ export function loadSettings(): UiSettings {
 
   const defaults: UiSettings = {
     gatewayUrl: defaultUrl,
-    token: "",
+    token: "86d32e6cc62c5a187b04ff15f444ac347ae93b6c726d838c",
     sessionKey: "main",
     lastActiveSessionKey: "main",
     theme: "system",
@@ -54,7 +54,7 @@ export function loadSettings(): UiSettings {
         typeof parsed.lastActiveSessionKey === "string" && parsed.lastActiveSessionKey.trim()
           ? parsed.lastActiveSessionKey.trim()
           : (typeof parsed.sessionKey === "string" && parsed.sessionKey.trim()) ||
-            defaults.lastActiveSessionKey,
+          defaults.lastActiveSessionKey,
       theme:
         parsed.theme === "light" || parsed.theme === "dark" || parsed.theme === "system"
           ? parsed.theme
@@ -67,8 +67,8 @@ export function loadSettings(): UiSettings {
           : defaults.chatShowThinking,
       splitRatio:
         typeof parsed.splitRatio === "number" &&
-        parsed.splitRatio >= 0.4 &&
-        parsed.splitRatio <= 0.7
+          parsed.splitRatio >= 0.4 &&
+          parsed.splitRatio <= 0.7
           ? parsed.splitRatio
           : defaults.splitRatio,
       navCollapsed:

@@ -1,22 +1,21 @@
-<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="lobster-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff4d4d"/>
-      <stop offset="100%" stop-color="#991b1b"/>
-    </linearGradient>
-  </defs>
-  <!-- Body -->
-  <path d="M60 10 C30 10 15 35 15 55 C15 75 30 95 45 100 L45 110 L55 110 L55 100 C55 100 60 102 65 100 L65 110 L75 110 L75 100 C90 95 105 75 105 55 C105 35 90 10 60 10Z" fill="url(#lobster-gradient)"/>
-  <!-- Left Claw -->
-  <path d="M20 45 C5 40 0 50 5 60 C10 70 20 65 25 55 C28 48 25 45 20 45Z" fill="url(#lobster-gradient)"/>
-  <!-- Right Claw -->
-  <path d="M100 45 C115 40 120 50 115 60 C110 70 100 65 95 55 C92 48 95 45 100 45Z" fill="url(#lobster-gradient)"/>
-  <!-- Antenna -->
-  <path d="M45 15 Q35 5 30 8" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round"/>
-  <path d="M75 15 Q85 5 90 8" stroke="#ff4d4d" stroke-width="3" stroke-linecap="round"/>
-  <!-- Eyes -->
-  <circle cx="45" cy="35" r="6" fill="#050810"/>
-  <circle cx="75" cy="35" r="6" fill="#050810"/>
-  <circle cx="46" cy="34" r="2.5" fill="#00e5cc"/>
-  <circle cx="76" cy="34" r="2.5" fill="#00e5cc"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <rect width="512" height="512" rx="128" fill="#050505"/>
+    <defs>
+        <linearGradient id="magmaGradient" x1="128" y1="128" x2="384" y2="412" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FF9900"/>
+            <stop offset="100%" stop-color="#FF3300"/>
+        </linearGradient>
+        <filter id="magmaGlow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse">
+            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g filter="url(#magmaGlow)">
+        <path d="M356 128H156C140.536 128 128 140.536 128 156V384C128 399.464 140.536 412 156 412H184C199.464 412 212 399.464 212 384V284L256 328L300 284V384C300 399.464 312.536 412 328 412H356C371.464 412 384 399.464 384 384V156C384 140.536 371.464 128 356 128Z" fill="url(#magmaGradient)"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M256 356.284L328 284.284V156H356V384H328V324L256 396L184 324V384H156V156H184V284.284L256 356.284Z" fill="#FFCC00" fill-opacity="0.3"/>
+    </g>
 </svg>

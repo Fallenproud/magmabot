@@ -1,0 +1,204 @@
+/* MagmaBot Command Center - Upgraded High Tech Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root {
+    --bg-primary: #050505;
+    --bg-secondary: #0f0505;
+    /* Slight red tint for Magma feel */
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-muted: #666666;
+
+    /* Magma Accents */
+    --accent-color: #FF3300;
+    /* Magma Red/Orange */
+    --accent-secondary: #FF9900;
+    /* Bright Orange */
+
+    --accent-dim: rgba(255, 51, 0, 0.4);
+    --accent-glow: 0 0 15px rgba(255, 51, 0, 0.3);
+    --accent-glow-strong: 0 0 25px rgba(255, 51, 0, 0.7);
+
+    /* Error/Danger */
+    --danger-color: #ff0000;
+    --danger-glow: 0 0 15px rgba(255, 0, 0, 0.5);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(15, 5, 5, 0.7);
+    --glass-border: rgba(255, 100, 50, 0.15);
+    --glass-blur: blur(16px);
+
+    /* Fonts */
+    --font-heading: 'Orbitron', sans-serif;
+    --font-subheading: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    background-image:
+        radial-gradient(circle at 15% 50%, rgba(255, 51, 0, 0.05) 0%, transparent 30%),
+        radial-gradient(circle at 85% 30%, rgba(255, 153, 0, 0.04) 0%, transparent 30%);
+}
+
+/* --- Typography Overrides --- */
+.brand-title {
+    font-family: var(--font-heading);
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-shadow: var(--accent-glow);
+    background: linear-gradient(to bottom, #FFcc00, #FF3300);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-sub,
+.page-sub,
+.card-sub {
+    font-family: var(--font-subheading);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--accent-secondary);
+}
+
+.page-title,
+.card-title {
+    font-family: var(--font-heading);
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-family: var(--font-mono);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* --- Glass Panels --- */
+.sidebar,
+.nav,
+.topbar,
+.card,
+.panel,
+aside {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.topbar {
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.nav {
+    border-right: 1px solid var(--glass-border);
+}
+
+/* --- Interactive Elements --- */
+.card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideIn 0.4s ease-out forwards;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-secondary);
+    box-shadow: var(--accent-glow), 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+}
+
+button.primary,
+.btn.primary {
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent-color));
+    color: #000;
+    font-family: var(--font-subheading);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: var(--accent-glow);
+    border: none;
+    transition: all 0.2s ease;
+}
+
+button.primary:hover,
+.btn.primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--accent-glow-strong);
+    filter: brightness(1.2);
+}
+
+input,
+select,
+textarea {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent-secondary);
+    box-shadow: var(--accent-glow), inset 0 0 10px rgba(255, 51, 0, 0.1);
+    outline: none;
+}
+
+/* --- Status Indicators --- */
+.statusDot.ok,
+.stat-value.ok {
+    color: var(--accent-secondary);
+    text-shadow: var(--accent-glow);
+}
+
+.statusDot.ok {
+    animation: pulse 2s infinite;
+}
+
+/* --- Animations --- */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 51, 0, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(255, 51, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 51, 0, 0);
+    }
+}
+
+/* --- Scrollbars --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #442222;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}

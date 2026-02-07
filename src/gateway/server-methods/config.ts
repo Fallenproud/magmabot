@@ -1,6 +1,7 @@
 import type { GatewayRequestHandlers, RespondFn } from "./types.js";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../../agents/agent-scope.js";
 import { listChannelPlugins } from "../../channels/plugins/index.js";
+import { listCoreChannelMetadata } from "../../channels/plugins/core-metadata.js";
 import {
   CONFIG_PATH,
   loadConfig,
@@ -131,6 +132,10 @@ export const configHandlers: GatewayRequestHandlers = {
         debug: () => {},
       },
     });
+    const coreChannels = listCoreChannelMetadata();
+    const pluginChannels = listChannelPlugins();
+    const channels = [...coreChannels, ...pluginChannels];
+
     const schema = buildConfigSchema({
       plugins: pluginRegistry.plugins.map((plugin) => ({
         id: plugin.id,
@@ -139,10 +144,10 @@ export const configHandlers: GatewayRequestHandlers = {
         configUiHints: plugin.configUiHints,
         configSchema: plugin.configJsonSchema,
       })),
-      channels: listChannelPlugins().map((entry) => ({
+      channels: channels.map((entry) => ({
         id: entry.id,
-        label: entry.meta.label,
-        description: entry.meta.blurb,
+        label: entry.meta?.label,
+        description: entry.meta?.blurb,
         configSchema: entry.configSchema?.schema,
         configUiHints: entry.configSchema?.uiHints,
       })),

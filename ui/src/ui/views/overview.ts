@@ -53,8 +53,8 @@ export function renderOverview(props: OverviewProps) {
               href="https://docs.openclaw.ai/web/dashboard"
               target="_blank"
               rel="noreferrer"
-              title="Control UI auth docs (opens in new tab)"
-              >Docs: Control UI auth</a
+              title="Control UI auth manual (opens in new tab)"
+              >Manual: Control UI auth</a
             >
           </div>
         </div>
@@ -69,8 +69,8 @@ export function renderOverview(props: OverviewProps) {
             href="https://docs.openclaw.ai/web/dashboard"
             target="_blank"
             rel="noreferrer"
-            title="Control UI auth docs (opens in new tab)"
-            >Docs: Control UI auth</a
+            title="Control UI auth manual (opens in new tab)"
+            >Manual: Control UI auth</a
           >
         </div>
       </div>
@@ -130,9 +130,9 @@ export function renderOverview(props: OverviewProps) {
             <input
               .value=${props.settings.gatewayUrl}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSettingsChange({ ...props.settings, gatewayUrl: v });
-              }}
+      const v = (e.target as HTMLInputElement).value;
+      props.onSettingsChange({ ...props.settings, gatewayUrl: v });
+    }}
               placeholder="ws://100.x.y.z:18789"
             />
           </label>
@@ -141,10 +141,10 @@ export function renderOverview(props: OverviewProps) {
             <input
               .value=${props.settings.token}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSettingsChange({ ...props.settings, token: v });
-              }}
-              placeholder="OPENCLAW_GATEWAY_TOKEN"
+      const v = (e.target as HTMLInputElement).value;
+      props.onSettingsChange({ ...props.settings, token: v });
+    }}
+              placeholder="MAGMABOT_GATEWAY_TOKEN"
             />
           </label>
           <label class="field">
@@ -153,9 +153,9 @@ export function renderOverview(props: OverviewProps) {
               type="password"
               .value=${props.password}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onPasswordChange(v);
-              }}
+      const v = (e.target as HTMLInputElement).value;
+      props.onPasswordChange(v);
+    }}
               placeholder="system or shared password"
             />
           </label>
@@ -164,9 +164,9 @@ export function renderOverview(props: OverviewProps) {
             <input
               .value=${props.settings.sessionKey}
               @input=${(e: Event) => {
-                const v = (e.target as HTMLInputElement).value;
-                props.onSessionKeyChange(v);
-              }}
+      const v = (e.target as HTMLInputElement).value;
+      props.onSessionKeyChange(v);
+    }}
             />
           </label>
         </div>
@@ -202,19 +202,18 @@ export function renderOverview(props: OverviewProps) {
             </div>
           </div>
         </div>
-        ${
-          props.lastError
-            ? html`<div class="callout danger" style="margin-top: 14px;">
+        ${props.lastError
+      ? html`<div class="callout danger" style="margin-top: 14px;">
               <div>${props.lastError}</div>
               ${authHint ?? ""}
               ${insecureContextHint ?? ""}
             </div>`
-            : html`
+      : html`
                 <div class="callout" style="margin-top: 14px">
                   Use Channels to link WhatsApp, Telegram, Discord, Signal, or iMessage.
                 </div>
               `
-        }
+    }
       </div>
     </section>
 

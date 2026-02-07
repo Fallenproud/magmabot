@@ -1,0 +1,32 @@
+{
+  "id": "crypto-revenue-autonomous",
+  "name": "Crypto-Only Autonomous Revenue Agent",
+  "version": "1.1.0",
+  "risk_tier": "high",
+  "permissions": {
+    "browser": true,
+    "network": true,
+    "wallet_ops": [
+      "create",
+      "monitor",
+      "verify"
+    ],
+    "filesystem": [
+      "read",
+      "write"
+    ]
+  },
+  "inputs": {
+    "target_usd": 1000,
+    "chains": [
+      "base",
+      "solana"
+    ],
+    "token": "USDC"
+  },
+  "runtime": {
+    "execution_model": "background_worker",
+    "idempotency": true,
+    "kill_switch": true
+  }
+}
