@@ -30,8 +30,8 @@ if exist "%~dp0.env" (
 )
 
 :: Use env var or fall back to default
-if not defined OPENCLAW_GATEWAY_TOKEN set "OPENCLAW_GATEWAY_TOKEN=magbot123"
-set "TOKEN=!OPENCLAW_GATEWAY_TOKEN!"
+if not defined MAGMABOT_TOKEN set "MAGMABOT_TOKEN=magbot123"
+set "TOKEN=!MAGMABOT_TOKEN!"
 set "PORT=18789"
 
 :: Start Gateway in background

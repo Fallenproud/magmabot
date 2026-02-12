@@ -75,3 +75,8 @@ USER.md
 memory/
 .agent/*.json
 !.agent/workflows/
+
+# Secrets & local config (NEVER COMMIT)
+*.secrets
+*.secrets.enc
+openclaw.json

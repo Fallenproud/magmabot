@@ -1,5 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const token = 'magbot12';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function loadToken() {
+  if (process.env.MAGMABOT_TOKEN) return process.env.MAGMABOT_TOKEN;
+  const envPath = path.resolve(__dirname, '..', '.env');
+  if (fs.existsSync(envPath)) {
+    for (const line of fs.readFileSync(envPath, 'utf-8').split('\n')) {
+      const m = line.match(/^MAGMABOT_TOKEN=(.+)$/);
+      if (m) return m[1].trim();
+    }
+  }
+  return 'magbot123';
+}
+
+const token = loadToken();
 const port = 18789;
 
 async function checkSchema() {

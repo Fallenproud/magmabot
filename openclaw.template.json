@@ -1,0 +1,55 @@
+{
+  "$comment": "REDACTED TEMPLATE — Copy to ~/.openclaw/openclaw.json and fill in secrets",
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "agents": {
+    "defaults": {
+      "maxConcurrent": 8,
+      "subagents": {
+        "maxConcurrent": 12
+      },
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "workspace": "C:\\Users\\YOUR_USER\\.openclaw\\workspace",
+      "models": {
+        "zai/glm-4.7": {
+          "alias": "GLM"
+        }
+      },
+      "model": {
+        "primary": "zai/glm-4.7"
+      },
+      "memorySearch": {
+        "provider": "openai",
+        "remote": {
+          "baseUrl": "https://api.z.ai/v1",
+          "apiKey": "${ZAI_API_KEY}"
+        }
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "${MAGMABOT_TOKEN}"
+    },
+    "port": 18789,
+    "bind": "loopback"
+  },
+  "auth": {
+    "profiles": {
+      "zai:default": {
+        "provider": "zai",
+        "mode": "api_key"
+      }
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  }
+}

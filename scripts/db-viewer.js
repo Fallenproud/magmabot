@@ -12,15 +12,15 @@ const DB_PATH = path.join(STATE_DIR, 'memory', 'main.sqlite');
 // Load token from .env or fall back to env var
 function loadEnvToken() {
   // Check process.env first
-  if (process.env.OPENCLAW_GATEWAY_TOKEN) {
-    return process.env.OPENCLAW_GATEWAY_TOKEN;
+  if (process.env.MAGMABOT_TOKEN) {
+    return process.env.MAGMABOT_TOKEN;
   }
   // Try to read .env from the project root
   const envPath = path.resolve(import.meta.dirname || '.', '..', '.env');
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, 'utf-8').split('\n');
     for (const line of lines) {
-      const match = line.match(/^OPENCLAW_GATEWAY_TOKEN=(.+)$/);
+      const match = line.match(/^MAGMABOT_TOKEN=(.+)$/);
       if (match) return match[1].trim();
     }
   }
@@ -32,8 +32,12 @@ const AUTH_TOKEN = loadEnvToken();
 function checkAuth(req, res) {
   if (!AUTH_TOKEN) return true; // No token configured, allow (dev mode)
   const url = new URL(req.url, `http://localhost:${PORT}`);
+  // Check query param
   const token = url.searchParams.get('token');
   if (token === AUTH_TOKEN) return true;
+  // Check Authorization header
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ') && authHeader.slice(7) === AUTH_TOKEN) return true;
   res.writeHead(401, { 'Content-Type': 'text/html' });
   res.end(`
     <!DOCTYPE html>
@@ -244,10 +248,10 @@ function serveTable(res, tableName, url) {
   }
 }
 
-server.listen(PORT, () => {
-  console.log(`MagmaBot DB Explorer running at http://localhost:${PORT}`);
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`MagmaBot DB Explorer running at http://127.0.0.1:${PORT}`);
   if (AUTH_TOKEN) {
-    console.log(`Auth enabled — use ?token=<token> to access`);
+    console.log(`Auth enabled — use ?token=<token> or Authorization: Bearer <token>`);
   } else {
     console.log(`⚠ No auth token found — running in open mode`);
   }
