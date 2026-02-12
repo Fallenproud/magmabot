@@ -19,8 +19,19 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
-:: Set a stable token for sync
-set "TOKEN=magbot123"
+:: Load environment variables from .env
+if exist "%~dp0.env" (
+    echo    [SYSTEM] Loading environment from .env...
+    for /f "usebackq tokens=1,* delims==" %%A in ("%~dp0.env") do (
+        set "%%A=%%B"
+    )
+) else (
+    echo    [WARNING] .env not found — using defaults
+)
+
+:: Use env var or fall back to default
+if not defined OPENCLAW_GATEWAY_TOKEN set "OPENCLAW_GATEWAY_TOKEN=magbot123"
+set "TOKEN=!OPENCLAW_GATEWAY_TOKEN!"
 set "PORT=18789"
 
 :: Start Gateway in background

@@ -8,21 +8,94 @@ const PORT = 18790;
 const STATE_DIR = path.join(os.homedir(), '.openclaw');
 const DB_PATH = path.join(STATE_DIR, 'memory', 'main.sqlite');
 
+// ---------- Auth ----------
+// Load token from .env or fall back to env var
+function loadEnvToken() {
+  // Check process.env first
+  if (process.env.OPENCLAW_GATEWAY_TOKEN) {
+    return process.env.OPENCLAW_GATEWAY_TOKEN;
+  }
+  // Try to read .env from the project root
+  const envPath = path.resolve(import.meta.dirname || '.', '..', '.env');
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf-8').split('\n');
+    for (const line of lines) {
+      const match = line.match(/^OPENCLAW_GATEWAY_TOKEN=(.+)$/);
+      if (match) return match[1].trim();
+    }
+  }
+  return null;
+}
+
+const AUTH_TOKEN = loadEnvToken();
+
+function checkAuth(req, res) {
+  if (!AUTH_TOKEN) return true; // No token configured, allow (dev mode)
+  const url = new URL(req.url, `http://localhost:${PORT}`);
+  const token = url.searchParams.get('token');
+  if (token === AUTH_TOKEN) return true;
+  res.writeHead(401, { 'Content-Type': 'text/html' });
+  res.end(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>MagmaBot DB Explorer - Unauthorized</title>
+      <style>
+        body { background: #050505; color: #ff4500; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #111; padding: 2rem; border-radius: 8px; border: 1px solid #ff3300; text-align: center; max-width: 400px; }
+        h1 { margin-top: 0; font-size: 1.4rem; }
+        code { background: #222; padding: 0.2rem 0.5rem; border-radius: 3px; color: #ff9900; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <h1>🔒 Access Denied</h1>
+        <p>Provide a valid token via <code>?token=YOUR_TOKEN</code></p>
+      </div>
+    </body>
+    </html>
+  `);
+  return false;
+}
+
+// ---------- Safety helpers ----------
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getValidTableNames(db) {
+  return db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map(r => r.name);
+}
+
+// ---------- Server ----------
 const server = http.createServer((req, res) => {
+  if (!checkAuth(req, res)) return;
+
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
   if (url.pathname === '/') {
-    serveIndex(res);
+    serveIndex(res, url);
   } else if (url.pathname.startsWith('/table/')) {
-    const tableName = url.pathname.split('/')[2];
-    serveTable(res, tableName);
+    const tableName = decodeURIComponent(url.pathname.split('/')[2]);
+    serveTable(res, tableName, url);
   } else {
     res.writeHead(404);
     res.end('Not Found');
   }
 });
 
-function serveIndex(res) {
+function tokenQuery(url) {
+  const t = url.searchParams.get('token');
+  return t ? `?token=${encodeURIComponent(t)}` : '';
+}
+
+function serveIndex(res, url) {
   if (!fs.existsSync(DB_PATH)) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(`
@@ -39,7 +112,7 @@ function serveIndex(res) {
       <body>
         <div class="card">
           <h1>MagmaBot DB Explorer</h1>
-          <p>Database not found at: <br><code>${DB_PATH}</code></p>
+          <p>Database not found at: <br><code>${escapeHtml(DB_PATH)}</code></p>
           <p>Please start MagmaBot and perform a memory sync first.</p>
         </div>
       </body>
@@ -51,16 +124,16 @@ function serveIndex(res) {
   let db;
   try {
     db = new DatabaseSync(DB_PATH);
-    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+    const tables = getValidTableNames(db);
+    const tq = tokenQuery(url);
 
     let tableHtml = "";
-    for (const table of tables) {
-      const name = table.name;
-      const count = db.prepare("SELECT COUNT(*) as c FROM " + name).get().c;
+    for (const name of tables) {
+      const count = db.prepare(`SELECT COUNT(*) as c FROM "${name}"`).get().c;
       tableHtml += `
         <div class="table-card">
-          <h3>${name} (${count} rows)</h3>
-          <a href="/table/${name}">View Data</a>
+          <h3>${escapeHtml(name)} (${count} rows)</h3>
+          <a href="/table/${encodeURIComponent(name)}${tq}">View Data</a>
         </div>
       `;
     }
@@ -89,28 +162,46 @@ function serveIndex(res) {
     `);
   } catch (err) {
     res.writeHead(500);
-    res.end("Error: " + err.message);
+    res.end("Error: " + escapeHtml(err.message));
   } finally {
     if (db) db.close();
   }
 }
 
-function serveTable(res, tableName) {
+function serveTable(res, tableName, url) {
   let db;
   try {
     db = new DatabaseSync(DB_PATH);
-    const data = db.prepare("SELECT * FROM " + tableName + " LIMIT 100").all();
+
+    // Validate table name against actual tables (prevents SQL injection)
+    const validTables = getValidTableNames(db);
+    if (!validTables.includes(tableName)) {
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Not Found</title>
+        <style>body { background: #050505; color: #ff4500; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }</style>
+        </head>
+        <body><h1>Table "${escapeHtml(tableName)}" not found</h1></body>
+        </html>
+      `);
+      return;
+    }
+
+    const data = db.prepare(`SELECT * FROM "${tableName}" LIMIT 100`).all();
+    const tq = tokenQuery(url);
 
     let headers = "";
     let rows = "";
 
     if (data.length > 0) {
       const keys = Object.keys(data[0]);
-      headers = keys.map(k => `<th>${k}</th>`).join("");
+      headers = keys.map(k => `<th>${escapeHtml(k)}</th>`).join("");
       rows = data.map(row => `<tr>${keys.map(k => {
         let val = row[k];
         if (typeof val === 'string' && val.length > 100) val = val.substring(0, 100) + "...";
-        return `<td>${val}</td>`;
+        return `<td>${escapeHtml(val)}</td>`;
       }).join("")}</tr>`).join("");
     } else {
       headers = "<th>No data</th>";
@@ -122,7 +213,7 @@ function serveTable(res, tableName) {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${tableName} - MagmaBot DB</title>
+        <title>${escapeHtml(tableName)} - MagmaBot DB</title>
         <style>
           body { background: #050505; color: #eee; font-family: sans-serif; margin: 0; padding: 1rem; }
           h1 { color: #ff3300; }
@@ -134,8 +225,8 @@ function serveTable(res, tableName) {
         </style>
       </head>
       <body>
-        <a href="/" class="back"><- Back to Overview</a>
-        <h1>Table: ${tableName}</h1>
+        <a href="/${tq}" class="back"><- Back to Overview</a>
+        <h1>Table: ${escapeHtml(tableName)}</h1>
         <div style="overflow-x: auto;">
           <table>
             <thead><tr>${headers}</tr></thead>
@@ -147,7 +238,7 @@ function serveTable(res, tableName) {
     `);
   } catch (err) {
     res.writeHead(500);
-    res.end("Error: " + err.message);
+    res.end("Error: " + escapeHtml(err.message));
   } finally {
     if (db) db.close();
   }
@@ -155,4 +246,9 @@ function serveTable(res, tableName) {
 
 server.listen(PORT, () => {
   console.log(`MagmaBot DB Explorer running at http://localhost:${PORT}`);
+  if (AUTH_TOKEN) {
+    console.log(`Auth enabled — use ?token=<token> to access`);
+  } else {
+    console.log(`⚠ No auth token found — running in open mode`);
+  }
 });
